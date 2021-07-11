@@ -49,8 +49,8 @@ const userSchema = new mongoose.Schema({
     enum: ["tier 1", "tier 2", "tier 3", "tier 4", "tier 5", "tier 6", "tier 7", "tier 8", "pegasus", "doom", "unicorn", "donkey"]
   },
   group: {
-    type: "String",
-    default: "none"
+    type: mongoose.Schema.ObjectId,
+    ref: "Group"
   },
   guild: {
     type: mongoose.Schema.ObjectId,
@@ -63,9 +63,12 @@ userSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guild',
     select: 'id'
-  })
+  }).populate({
+    path: 'group',
+    select: 'name'
+  });
 
-  next()
+  next();
 })
 
 const User = mongoose.model('User', userSchema);

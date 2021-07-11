@@ -16,7 +16,7 @@ exports.getGuildByDiscordId = catchAsync(async (req, res, next) => {
       guild
     }
   });
-})
+});
 
 
 // BASE CRUD

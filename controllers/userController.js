@@ -1,11 +1,34 @@
+const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const User = require('../models/userModel');
 
+exports.getUserByDiscordId = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { guild } = req.body;
 
-// ADMIN STUFF
+  const user = await User.findOne({ id, guild });
+
+  if (!user) {
+    return next(new AppError("No user found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user
+    }
+  });
+});
+
+// CRUD STUFF
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
+  const queryStr = req.body;
+  let query = User.find();
+
+  if (queryStr) query.find(queryStr);
+
+  const users = await query;
 
   res.status(200).json({
     status: "success",
@@ -18,7 +41,7 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 
 exports.getUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const user = await User.findById(id);
+  const user = await User.findById(id).populate({ path: "group" });
 
   res.status(200).json({
     status: "success",
@@ -30,8 +53,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
 
 exports.createUser = catchAsync(async (req, res, next) => {
   const { id, familyName, characterClass, stance, regularAp, awakeningAp, dp, guild } = req.body;
-
-  const newUser = await Event.create({
+  const newUser = await User.create({
     id,
     familyName,
     characterClass,
@@ -39,7 +61,8 @@ exports.createUser = catchAsync(async (req, res, next) => {
     regularAp,
     awakeningAp,
     dp,
-    guild
+    guild,
+    group: '60eaf93a1b094451a83c45e7'
   });
 
   res.status(201).json({

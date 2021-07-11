@@ -1,10 +1,9 @@
 const express = require('express');
 const { getGuildByDiscordId, getAllGuilds, getGuild, createGuild, updateGuild, deleteGuild } = require('../controllers/guildController');
-const { protect } = require('../controllers/authController');
+const groupRouter = require('../routes/groupRoutes');
 
 const router = express.Router();
-
-//router.use(protect)
+router.use('/:id/groups', groupRouter)
 
 router.get('/', getAllGuilds);
 router.get('/:id', getGuild);

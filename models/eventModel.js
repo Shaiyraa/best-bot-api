@@ -19,9 +19,8 @@ const eventSchema = new mongoose.Schema({
     required: [true, "Provide mandatory."]
   },
   alerts: {
-    type: String,
-    enum: ["yes", "no"],
-    default: "no"
+    type: Boolean,
+    default: false
   },
   active: {
     type: Boolean,
@@ -47,7 +46,17 @@ const eventSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Guild"
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
+
+eventSchema.virtual('hour').get(function () {
+  let minutes = this.date.getMinutes();
+  if (minutes < 10) minutes = `0${minutes}`;
+
+  return `${this.date.getHours()}:${minutes}`;
+})
 
 eventSchema.pre(/^find/, function (next) {
   this.populate({
@@ -73,7 +82,7 @@ eventSchema.pre(/^find/, function (next) {
     })
     .populate({
       path: 'guild',
-      select: 'id announcementsChannel remindersChannel memberRole officerRole'
+      select: 'id announcementsChannel remindersChannel memberRole officerRole groups'
     })
 
   next()

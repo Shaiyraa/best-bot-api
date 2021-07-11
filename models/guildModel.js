@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+
+
 const guildSchema = new mongoose.Schema({
   id: {
     type: String,
@@ -21,6 +23,24 @@ const guildSchema = new mongoose.Schema({
     type: String,
     required: [true, "Provide remindersChannel name."]
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+guildSchema.virtual('groups', {
+  ref: 'Group',
+  foreignField: 'guild', // where is the value kept on group doc
+  localField: '_id' // in what field the same value is stored in guild doc
+});
+
+guildSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "groups",
+    select: "name maxCount"
+  });
+
+  next();
 });
 
 const Guild = mongoose.model('Guild', guildSchema);

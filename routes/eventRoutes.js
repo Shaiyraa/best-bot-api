@@ -1,11 +1,11 @@
 const express = require('express');
-const { getAllEvents, getEvent, createEvent, updateEvent, deleteEvent } = require('../controllers/eventController');
+const { changeUserGroup, getAllEvents, getEvent, createEvent, updateEvent, deleteEvent } = require('../controllers/eventController');
 const { protect } = require('../controllers/authController');
 
 const router = express.Router();
 
 //router.use(protect)
-
+router.patch('/change-group', changeUserGroup);
 router.get('/', getAllEvents);
 router.get('/:id', getEvent);
 router.post('/', createEvent);

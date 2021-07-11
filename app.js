@@ -13,6 +13,7 @@ const hpp = require('hpp');
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController');
 const guildRouter = require('./routes/guildRoutes');
+const groupRouter = require('./routes/groupRoutes');
 const userRouter = require('./routes/userRoutes');
 const eventRouter = require('./routes/eventRoutes');
 
@@ -44,6 +45,7 @@ if (process.env.NODE_ENV === 'development') {
 
 
 app.use('/api/v1/guilds', guildRouter);
+app.use('/api/v1/groups', groupRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/events', eventRouter);
 
