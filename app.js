@@ -57,3 +57,30 @@ app.all('*', (req, res, next) => {
 app.use(globalErrorHandler);
 
 module.exports = app;
+
+
+/*
+TODO:
+EVENTS
+- limited signups,
+- close signups,
+- restarting listeners after shutdown
+
+- event deletion
+
+- validate events (no multiple events on the same datetime; only 3 events per day)
+- autoreminders
+- refactor updating events to use reaction icons = one update at a time
+
+MEMBERS
+- group creation, assigning
+- profile showing
+
+- profile updating
+
+- displaying players in a list
+- sorting lists
+
+- edit history (logs)
+- fix shai XD
+ */

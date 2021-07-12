@@ -59,6 +59,13 @@ eventSchema.virtual('hour').get(function () {
 })
 
 eventSchema.pre(/^find/, function (next) {
+  // this points to the query
+  this.find({ active: { $ne: false } });
+
+  next();
+})
+
+eventSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'undecidedMembers',
     populate: {

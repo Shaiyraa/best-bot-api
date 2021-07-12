@@ -9,7 +9,7 @@ exports.createGroup = catchAsync(async (req, res, next) => {
 
   const newGroup = await Group.create({
     guild: guildId,
-    name,
+    name: name.toUpperCase(),
     maxCount
   })
 

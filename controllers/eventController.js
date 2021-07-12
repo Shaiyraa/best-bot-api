@@ -5,7 +5,13 @@ const User = require('../models/userModel');
 
 
 exports.getAllEvents = catchAsync(async (req, res, next) => {
-  const events = await Event.find();
+  let queryStr = JSON.stringify(req.body);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+  let query = Event.find();
+  query.find(JSON.parse(queryStr));
+
+  const events = await query;
 
   res.status(200).json({
     status: "success",
@@ -72,7 +78,14 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const event = await Event.findByIdAndUpdate(id, req.body, {
+  const { type, alerts, content, mandatory } = req.body;
+
+  const event = await Event.findByIdAndUpdate(id, {
+    type,
+    alerts,
+    content,
+    mandatory
+  }, {
     new: true,
     runValidators: true
   });
@@ -89,7 +102,7 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
 
 exports.deleteEvent = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  await Event.findByIdAndUpdate(id, { active: false });
+  const event = await Event.findByIdAndUpdate(id, { active: false });
 
   res.status(204).json({
     status: "success",

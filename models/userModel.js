@@ -71,6 +71,13 @@ userSchema.pre(/^find/, function (next) {
   next();
 })
 
+// userSchema.pre(/^find/, function (next) {
+//   // this points to the query
+//   this.find({ active: { $ne: false } });
+
+//   next();
+// })
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

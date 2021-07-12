@@ -23,10 +23,11 @@ exports.getUserByDiscordId = catchAsync(async (req, res, next) => {
 // CRUD STUFF
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const queryStr = req.body;
-  let query = User.find();
+  let queryStr = JSON.stringify(req.body);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
-  if (queryStr) query.find(queryStr);
+  let query = User.find();
+  query.find(JSON.parse(queryStr));
 
   const users = await query;
 
