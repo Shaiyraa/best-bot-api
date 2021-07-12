@@ -62,11 +62,7 @@ module.exports = app;
 /*
 TODO:
 EVENTS
-- limited signups,
-- close signups,
 - restarting listeners after shutdown
-
-- event deletion
 
 - validate events (no multiple events on the same datetime; only 3 events per day)
 - autoreminders
@@ -75,7 +71,6 @@ EVENTS
 MEMBERS
 - group creation, assigning
 - profile showing
-
 - profile updating
 
 - displaying players in a list

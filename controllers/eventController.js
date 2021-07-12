@@ -5,7 +5,7 @@ const User = require('../models/userModel');
 
 
 exports.getAllEvents = catchAsync(async (req, res, next) => {
-  let queryStr = JSON.stringify(req.body);
+  let queryStr = JSON.stringify(req.query);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
 
   let query = Event.find();
@@ -114,6 +114,13 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   const { eventId, goToGroup, userDiscordId } = req.body;
   // 1. Find necessary data
   const event = await Event.findById(eventId);
+
+  // check if capped
+  if (event.yesMembers.length >= event.maxCount) return next(new AppError("Signups are full", 403))
+
+  // check if closed
+  if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1.5 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
+
   const user = await User.findOne({ id: userDiscordId });
   if (!user) return next(new AppError("User is not a part of the guild.", 400))
 

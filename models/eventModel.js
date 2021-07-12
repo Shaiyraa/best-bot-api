@@ -10,6 +10,10 @@ const eventSchema = new mongoose.Schema({
     type: Date,
     required: [true, "Provide event date."]
   },
+  maxCount: {
+    type: Number,
+    default: 100
+  },
   messageId: {
     type: String,
     required: [true, "Provide message ID."]
