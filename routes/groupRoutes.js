@@ -1,9 +1,11 @@
 const express = require('express');
-const { createGroup, assignGroup } = require('../controllers/groupController');
+const { createGroup, deleteGroup, assignOne, assignMany } = require('../controllers/groupController');
 
 const router = express.Router({ mergeParams: true });
 
-router.patch('/:id/assign', assignGroup)
+router.patch('/:id/assign-one', assignOne)
+router.patch('/:id/assign-many', assignMany)
 router.post('/', createGroup);
+router.delete('/:id', deleteGroup);
 
 module.exports = router;

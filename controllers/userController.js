@@ -76,7 +76,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const user = await User.findByIdAndUpdate(id, req.body, {
+  const user = await User.findByIdAndUpdate(id, req.query, {
     new: true,
     runValidators: true
   });

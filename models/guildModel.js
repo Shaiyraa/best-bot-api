@@ -37,7 +37,7 @@ guildSchema.virtual('groups', {
 guildSchema.pre(/^find/, function (next) {
   this.populate({
     path: "groups",
-    select: "name maxCount"
+    select: "_id name maxCount"
   });
 
   next();

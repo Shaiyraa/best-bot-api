@@ -7,6 +7,9 @@ exports.createGroup = catchAsync(async (req, res, next) => {
   if (!req.body.guildId) req.body.guildId = req.params.id
   const { guildId, name, maxCount } = req.body
 
+  const exisitng = await Group.find({ guild: guildId, name: name.toUpperCase() })   // TODO: get it done with indexing
+  if (exisitng) return next(new AppError("A group with this name already exists.", 403));
+
   const newGroup = await Group.create({
     guild: guildId,
     name: name.toUpperCase(),
@@ -21,29 +24,51 @@ exports.createGroup = catchAsync(async (req, res, next) => {
   })
 })
 
-exports.assignGroup = catchAsync(async (req, res, next) => {
+exports.deleteGroup = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  await Group.findByIdAndDelete(id);
+
+  res.status(204).json({
+    status: "success",
+    data: null
+  });
+})
+
+exports.assignOne = catchAsync(async (req, res, next) => {
   const groupId = req.params.id;
-  const { userId } = req.body;
+  const { userFamilyName } = req.body;
 
   // find group
   const group = await Group.findById(groupId);
   if (!group) return next(new AppError("This group doesn't exist", 404));
-  console.log(group)
-  // find user
-  const user = await User.findById(userId);
-  if (!user) return next(new AppError("This user doesn't exist", 404));
-  console.log(user)
 
-  // compare guilds
-  if (!group.guild._id.equals(user.guild._id)) return next(new AppError("Cannot assign this group to this user", 403))
-
-  // update group
-  await User.updateOne({ _id: user._id }, { group: group._id }, { new: true, runValidators: true })
+  // update user
+  const user = await User.updateOne({ familyName: userFamilyName, guild: group.guild }, { group: group._id }, { new: true, runValidators: true })
+  if (!user) return next(new AppError("There is no user.", 404));
 
   res.status(201).json({
     status: "success",
     data: {
       user
+    }
+  })
+})
+
+exports.assignMany = catchAsync(async (req, res, next) => {
+  const groupId = req.params.id;
+  const { familyNames } = req.body;
+
+  // find group
+  const group = await Group.findById(groupId);
+  if (!group) return next(new AppError("This group doesn't exist", 404));
+  console.log(familyNames)
+  // update users
+  const users = await User.updateMany({ familyName: { $in: familyNames }, guild: group.guild }, { group: group._id }, { new: true, runValidators: true });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      users
     }
   })
 })
