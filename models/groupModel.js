@@ -4,7 +4,13 @@ const mongoose = require('mongoose');
 const groupSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "Provide a name."]
+    validate: {
+      validator: function (value) {
+        return /^[a-zA-Z0-9_]{0,18}$/g.test(value);
+      },
+      message: props => `${props.value} is not a valid group name!`
+    },
+    required: [true, 'User phone number required']
   },
   maxCount: {
     type: Number,

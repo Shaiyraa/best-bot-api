@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["tier 1", "tier 2", "tier 3", "tier 4", "tier 5", "tier 6", "tier 7", "tier 8", "pegasus", "doom", "unicorn", "donkey"]
   },
+  private: {
+    type: Boolean,
+    default: false
+  },
   group: {
     type: mongoose.Schema.ObjectId,
     ref: "Group"
@@ -57,6 +61,13 @@ const userSchema = new mongoose.Schema({
     ref: "Guild",
     required: [true, "Provide guild."]
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+userSchema.virtual('gearscore').get(function () {
+  return Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
 });
 
 userSchema.pre(/^find/, function (next) {

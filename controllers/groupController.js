@@ -7,7 +7,7 @@ exports.createGroup = catchAsync(async (req, res, next) => {
   if (!req.body.guildId) req.body.guildId = req.params.id
   const { guildId, name, maxCount } = req.body
 
-  const exisitng = await Group.find({ guild: guildId, name: name.toUpperCase() })   // TODO: get it done with indexing
+  const exisitng = await Group.findOne({ guild: guildId, name: name.toUpperCase() })   // TODO: get it done with indexing
   if (exisitng) return next(new AppError("A group with this name already exists.", 403));
 
   const newGroup = await Group.create({

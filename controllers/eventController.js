@@ -78,14 +78,9 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const { type, alerts, content, mandatory } = req.body;
+  const { _id, maxCount, active, yesMembers, noMembers, undecidedMembers, date, messageId, guild, ...otherProps } = req.query;
 
-  const event = await Event.findByIdAndUpdate(id, {
-    type,
-    alerts,
-    content,
-    mandatory
-  }, {
+  const event = await Event.findByIdAndUpdate(id, otherProps, {
     new: true,
     runValidators: true
   });

@@ -64,20 +64,18 @@ TODO:
 EVENTS
 - validate events (only 3 events per day)
 - autoreminders
-- refactor updating events to use reaction icons = one update at a time
+- guild config default nw message
 
 MEMBERS
-- profile updating
-
 - do something about when ppl leave and their profile stays in db
-- displaying players in a list
 - sorting lists
 - edit history (logs)
-- fix shai XD
 
+- virtual property gs
 GROUPS
-- validate group name in db, so there can be only letters, numbers and _, without spaces
 - max group size
 
-- make custom validators for repeatable stuff, like make "succ" work for stance validation and return "succession"
+CONFIG
+ - editing config
+
  */
