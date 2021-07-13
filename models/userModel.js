@@ -67,7 +67,11 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.virtual('gearscore').get(function () {
-  return Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
+  if (this.stance === "succession") {
+    return this.regularAp + this.dp;
+  } else {
+    return Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
+  }
 });
 
 userSchema.pre(/^find/, function (next) {
