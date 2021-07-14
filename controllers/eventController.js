@@ -1,6 +1,7 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const Event = require('../models/eventModel');
+const Alert = require('../models/alertModel');
 const User = require('../models/userModel');
 
 
@@ -52,7 +53,6 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   // 2. PUSH USERS TO UNDECIDED ARRAY - MIDDLEWARE NEEDED, MAYBE NESTED ROUTE
   const userDocs = await User.find({ guild })
   userDocs.map(doc => newEvent.undecidedMembers.push(doc._id))
-
   await newEvent.save();
 
   const populated = await Event.populate(newEvent, [{
@@ -68,10 +68,21 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     }
   }]);
 
+  // 3. CREATE REMINDER
+  const alertDate = new Date(date)
+  alertDate.setHours(alertDate.getHours() - 2)
+
+  const alert = await Alert.create({
+    event: newEvent._id,
+    type: "undecided",
+    date: alertDate
+  })
+
   res.status(201).json({
     status: "success",
     data: {
-      event: populated
+      event: populated,
+      alert
     }
   });
 });

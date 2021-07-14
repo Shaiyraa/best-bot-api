@@ -10,11 +10,13 @@ const groupSchema = new mongoose.Schema({
       },
       message: props => `${props.value} is not a valid group name!`
     },
-    required: [true, 'User phone number required']
+    required: [true, 'Not a valid group name.']
   },
   maxCount: {
     type: Number,
-    default: 100
+    default: 20,
+    min: 1,
+    max: 100
   },
   guild: {
     type: mongoose.Schema.ObjectId,

@@ -16,6 +16,7 @@ const guildRouter = require('./routes/guildRoutes');
 const groupRouter = require('./routes/groupRoutes');
 const userRouter = require('./routes/userRoutes');
 const eventRouter = require('./routes/eventRoutes');
+const alertRouter = require('./routes/alertRoutes');
 
 
 
@@ -27,7 +28,7 @@ app.use(cors({ origin: 'http://localhost/' })); // TODO: make it work
 
 // limit max requests 
 const limiter = rateLimit({
-  max: 100,
+  max: 500,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP. Please, try again in an hour."
 });
@@ -48,6 +49,7 @@ app.use('/api/v1/guilds', guildRouter);
 app.use('/api/v1/groups', groupRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/events', eventRouter);
+app.use('/api/v1/alerts', alertRouter);
 
 // for all undefined routes
 app.all('*', (req, res, next) => {
@@ -61,17 +63,20 @@ module.exports = app;
 
 /*
 TODO:
+SECURITY
+- permissions
+
 EVENTS
 - validate events (only 3 events per day)
-- autoreminders
 - guild config default nw message
 
 MEMBERS
 - do something about when ppl leave and their profile stays in db
+  - find a hook for losing @member role
+
 - sorting lists
 - edit history (logs)
 
-- virtual property gs
 GROUPS
 - max group size
 
