@@ -1,8 +1,8 @@
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const compression = require('compression');
-
 // security
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
@@ -12,18 +12,17 @@ const hpp = require('hpp');
 
 const AppError = require('./utils/appError')
 const globalErrorHandler = require('./controllers/errorController');
+const { restrictToBot } = require('./controllers/authController');
 const guildRouter = require('./routes/guildRoutes');
 const groupRouter = require('./routes/groupRoutes');
 const userRouter = require('./routes/userRoutes');
 const eventRouter = require('./routes/eventRoutes');
 const alertRouter = require('./routes/alertRoutes');
 
-
-
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: 'http://localhost/' })); // TODO: make it work
+app.use(cors({ origin: '${process.env.API_URL}' })); // TODO: make it work
 //app.options(cors());
 
 // limit max requests 
@@ -40,16 +39,20 @@ app.use(xss());
 app.use(hpp());
 app.use(compression());
 
+
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
-};
+} else {
+  const accessLogStream = fs.createWriteStream(__dirname + '/logs/' + "access.log", { flags: 'a' });
+  app.use(morgan("combined", { stream: accessLogStream }));
+}
 
 
-app.use('/api/v1/guilds', guildRouter);
-app.use('/api/v1/groups', groupRouter);
-app.use('/api/v1/users', userRouter);
-app.use('/api/v1/events', eventRouter);
-app.use('/api/v1/alerts', alertRouter);
+app.use('/api/v1/guilds', restrictToBot, guildRouter);
+app.use('/api/v1/groups', restrictToBot, groupRouter);
+app.use('/api/v1/users', restrictToBot, userRouter);
+app.use('/api/v1/events', restrictToBot, eventRouter);
+app.use('/api/v1/alerts', restrictToBot, alertRouter);
 
 // for all undefined routes
 app.all('*', (req, res, next) => {
@@ -65,9 +68,13 @@ module.exports = app;
 TODO:
 SECURITY
 
+GUILD
+- edit history (logs)
+
 EVENTS
 - validate events (only 3 events per day)
 - validate events (no 2 events with the same datetime)
+- edit history (logs)
 
 MEMBERS
 - sorting lists
@@ -75,6 +82,7 @@ MEMBERS
 
 GROUPS
 - max group size
+- edit history (logs)
 
 CONFIG
  */

@@ -80,8 +80,9 @@ exports.assignOne = catchAsync(async (req, res, next) => {
   if (!group) return next(new AppError("This group doesn't exist", 404));
 
   // update user
-  const user = await User.updateOne({ familyName: userFamilyName, guild: group.guild }, { group: group._id }, { new: true, runValidators: true })
+  const user = await User.findOne({ familyName: userFamilyName, guild: group.guild })
   if (!user) return next(new AppError("There is no user.", 404));
+  await User.updateOne(user, { group: group._id }, { new: true, runValidators: true })
 
   res.status(201).json({
     status: "success",
