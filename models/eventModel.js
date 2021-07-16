@@ -32,7 +32,11 @@ const eventSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    default: "no description"
+    default: "No description"
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now()
   },
   yesMembers: [{
     type: mongoose.Schema.ObjectId,

@@ -64,16 +64,12 @@ module.exports = app;
 /*
 TODO:
 SECURITY
-- permissions
 
 EVENTS
 - validate events (only 3 events per day)
-- guild config default nw message
+- validate events (no 2 events with the same datetime)
 
 MEMBERS
-- do something about when ppl leave and their profile stays in db
-  - find a hook for losing @member role
-
 - sorting lists
 - edit history (logs)
 
@@ -81,6 +77,4 @@ GROUPS
 - max group size
 
 CONFIG
- - editing config
-
  */

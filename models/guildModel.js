@@ -22,6 +22,14 @@ const guildSchema = new mongoose.Schema({
   remindersChannel: {
     type: String,
     required: [true, "Provide remindersChannel name."]
+  },
+  defaultEventMessage: {
+    type: String,
+    default: "No description"
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now()
   }
 }, {
   toJSON: { virtuals: true },

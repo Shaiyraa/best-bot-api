@@ -65,7 +65,7 @@ exports.createGuild = catchAsync(async (req, res, next) => {
 
 exports.updateGuild = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const guild = await Guild.findByIdAndUpdate(id, req.body, {
+  const guild = await Guild.findByIdAndUpdate(id, req.query, {
     new: true,
     runValidators: true
   });

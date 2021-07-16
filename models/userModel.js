@@ -52,6 +52,19 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  active: {
+    type: Boolean,
+    default: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now()
+  },
+  deletedAt: Date,
+  deletedBy: {
+    type: String,
+    enum: ["user", "admin", "bot"]
+  },
   group: {
     type: mongoose.Schema.ObjectId,
     ref: "Group"
@@ -86,12 +99,12 @@ userSchema.pre(/^find/, function (next) {
   next();
 })
 
-// userSchema.pre(/^find/, function (next) {
-//   // this points to the query
-//   this.find({ active: { $ne: false } });
+userSchema.pre(/^find/, function (next) {
+  // this points to the query
+  this.find({ active: { $ne: false } });
 
-//   next();
-// })
+  next();
+})
 
 const User = mongoose.model('User', userSchema);
 

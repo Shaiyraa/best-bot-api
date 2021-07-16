@@ -93,7 +93,21 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  await User.findByIdAndUpdate(id, { active: false });
+  const { deletedBy } = req.query;
+
+  await User.findByIdAndUpdate(id, { active: false, deletedAt: Date.now(), deletedBy });
+
+  res.status(204).json({
+    status: "success",
+    data: null
+  });
+});
+
+exports.deleteUserByDiscordId = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { deletedBy } = req.query;
+
+  await User.findOneAndUpdate(id, { active: false, deletedAt: Date.now(), deletedBy });
 
   res.status(204).json({
     status: "success",
