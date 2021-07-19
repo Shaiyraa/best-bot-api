@@ -128,7 +128,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1.5 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
 
   const user = await User.findOne({ id: userDiscordId });
-  if (!user) return next(new AppError("User is not a part of the guild.", 400))
+  if (!user) return next(new AppError("Not a member.", 400))
 
   switch (goToGroup) {
     case "yes": {

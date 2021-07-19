@@ -65,12 +65,8 @@ module.exports = app;
 
 
 /*
-TODO:
-SECURITY
-
-GUILD
-- edit history (logs)
-
+CONFIG 
+-show config cmd
 EVENTS
 - validate events (only 3 events per day)
 - validate events (no 2 events with the same datetime)
@@ -84,5 +80,7 @@ GROUPS
 - max group size
 - edit history (logs)
 
-CONFIG
- */
+make exit not case sensitive
+??? group show members [name]
+more descriptive error messages
+*/

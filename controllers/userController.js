@@ -53,7 +53,7 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  const { id, familyName, characterClass, stance, regularAp, awakeningAp, dp, guild } = req.body;
+  const { id, familyName, characterClass, stance, regularAp, awakeningAp, dp, level, guild } = req.body;
   const newUser = await User.create({
     id,
     familyName,
@@ -62,8 +62,8 @@ exports.createUser = catchAsync(async (req, res, next) => {
     regularAp,
     awakeningAp,
     dp,
-    guild,
-    group: '60eaf93a1b094451a83c45e7'
+    level,
+    guild
   });
 
   res.status(201).json({
@@ -76,6 +76,9 @@ exports.createUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   let { id } = req.params;
+  
+  if(req.query.characterClass === "shai") req.query.stance = "awakening";
+
   const user = await User.findByIdAndUpdate(id, req.query, {
     new: true,
     runValidators: true
@@ -95,7 +98,12 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { deletedBy } = req.query;
 
-  await User.findByIdAndUpdate(id, { active: false, deletedAt: Date.now(), deletedBy });
+  // 1. FIND USER
+  const user = await User.findById(id)
+  if (!user) return next(new AppError("This user doesn\'t exist", 404));
+
+  // 2. UPDATE DOC
+  await User.updateOne({_id: user._id}, { active: false, deletedAt: Date.now(), deletedBy });
 
   res.status(204).json({
     status: "success",
@@ -107,7 +115,12 @@ exports.deleteUserByDiscordId = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { deletedBy } = req.query;
 
-  await User.findOneAndUpdate(id, { active: false, deletedAt: Date.now(), deletedBy });
+  // 1. FIND USER
+  const user = await User.findOne({ id })
+  if (!user) return next(new AppError("This user doesn\'t exist", 404));
+  
+  // 2. UPDATE DOC
+  await User.updateOne({_id: user._id}, { active: false, deletedAt: Date.now(), deletedBy });
 
   res.status(204).json({
     status: "success",

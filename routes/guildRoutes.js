@@ -3,10 +3,10 @@ const { getGuildByDiscordId, getAllGuilds, getGuild, createGuild, updateGuild, d
 const groupRouter = require('../routes/groupRoutes');
 
 const router = express.Router();
-router.use('/:id/groups', groupRouter)
+router.use('/:guildId/groups', groupRouter)
 
 router.get('/', getAllGuilds);
-router.get('/:id', getGuild);
+router.get('/:groupId', getGuild);
 router.post('/', createGuild);
 router.patch('/:id', updateGuild);
 router.delete('/:id', deleteGuild);

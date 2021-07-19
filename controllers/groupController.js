@@ -3,8 +3,24 @@ const catchAsync = require('../utils/catchAsync');
 const Group = require('../models/groupModel');
 const User = require('../models/userModel');
 
+// api/v1/guilds/2324524/groups/2342342
+exports.getGroup = catchAsync(async (req, res, next) => {
+  if (!req.body.guildId) req.body.guildId = req.params.guildId;
+  const groupId = req.params.groupId;
+
+  const group = await Group.findOne({ guild: req.body.guildId, group: groupId});
+  if(!group) return next(new AppError("Group doesn't exist.", 404));
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      group
+    }
+  });
+})
+
 exports.createGroup = catchAsync(async (req, res, next) => {
-  if (!req.body.guildId) req.body.guildId = req.params.id;
+  if (!req.body.guildId) req.body.guildId = req.params.guildId;
   const { guildId, name, maxCount } = req.body;
 
   const exisitng = await Group.findOne({ guild: guildId, name: name.toUpperCase() })   // TODO: get it done with indexing
@@ -81,13 +97,15 @@ exports.assignOne = catchAsync(async (req, res, next) => {
 
   // update user
   const user = await User.findOne({ familyName: userFamilyName, guild: group.guild })
+  console.log(user)
   if (!user) return next(new AppError("There is no user.", 404));
-  await User.updateOne(user, { group: group._id }, { new: true, runValidators: true })
+  const newUser = await User.updateOne({ _id: user._id, guild: group.guild }, { group: group._id }, { new: true, runValidators: true })
 
+  console.log(newUser)
   res.status(201).json({
     status: "success",
     data: {
-      user
+      newUser
     }
   });
 });

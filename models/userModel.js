@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
     required: [true, "Provide stance."],
     enum: ["awakening", "succession"]
   },
+  level: {
+    type: Number,
+    required: [true, "Provide level."]
+  },
   hp: {
     type: Number
   },
@@ -52,6 +56,7 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  proof: String,
   active: {
     type: Boolean,
     default: true
@@ -102,10 +107,17 @@ userSchema.pre(/^find/, function (next) {
 userSchema.pre(/^find/, function (next) {
   // this points to the query
   this.find({ active: { $ne: false } });
-
   next();
-})
+});
 
+userSchema.pre(/^save/, function (next) {
+ if(this.characterClass === "shai") {
+   this.stance = "awakening";
+ };
+
+ next();
+});
+ 
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
