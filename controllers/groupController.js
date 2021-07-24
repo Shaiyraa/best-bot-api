@@ -8,7 +8,7 @@ exports.getGroup = catchAsync(async (req, res, next) => {
   if (!req.body.guildId) req.body.guildId = req.params.guildId;
   const groupId = req.params.groupId;
 
-  const group = await Group.findOne({ guild: req.body.guildId, group: groupId});
+  const group = await Group.findOne({ guild: req.body.guildId, _id: groupId});
   if(!group) return next(new AppError("Group doesn't exist.", 404));
 
   res.status(200).json({

@@ -1,5 +1,6 @@
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const APIFeatures = require('../utils/apiFeatures');
 const User = require('../models/userModel');
 
 exports.getUserByDiscordId = catchAsync(async (req, res, next) => {
@@ -23,13 +24,15 @@ exports.getUserByDiscordId = catchAsync(async (req, res, next) => {
 // CRUD STUFF
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
-  let queryStr = JSON.stringify(req.query);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+  if (!req.filter) req.filter = {};
 
-  let query = User.find();
-  query.find(JSON.parse(queryStr));
+  const features = new APIFeatures(User.find(req.filter), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-  const users = await query;
+  const users = await features.query;
 
   res.status(200).json({
     status: "success",
@@ -77,8 +80,6 @@ exports.createUser = catchAsync(async (req, res, next) => {
 exports.updateUser = catchAsync(async (req, res, next) => {
   let { id } = req.params;
   
-  if(req.query.characterClass === "shai") req.query.stance = "awakening";
-
   const user = await User.findByIdAndUpdate(id, req.query, {
     new: true,
     runValidators: true
@@ -103,7 +104,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
 
   // 2. UPDATE DOC
-  await User.updateOne({_id: user._id}, { active: false, deletedAt: Date.now(), deletedBy });
+  await User.findByIdAndUpdate(user._id, { active: false, deletedAt: Date.now(), deletedBy });
 
   res.status(204).json({
     status: "success",
@@ -120,7 +121,7 @@ exports.deleteUserByDiscordId = catchAsync(async (req, res, next) => {
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
   
   // 2. UPDATE DOC
-  await User.updateOne({_id: user._id}, { active: false, deletedAt: Date.now(), deletedBy });
+  await User.findByIdAndUpdate(user._id, { active: false, deletedAt: Date.now(), deletedBy });
 
   res.status(204).json({
     status: "success",

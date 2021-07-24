@@ -64,12 +64,11 @@ app.use(globalErrorHandler);
 module.exports = app;
 
 
-/*
-CONFIG 
--show config cmd
+/*  
+QUICK SETUP TODO:
+- group edit [name] [param] [value]
+
 EVENTS
-- validate events (only 3 events per day)
-- validate events (no 2 events with the same datetime)
 - edit history (logs)
 
 MEMBERS
@@ -77,10 +76,70 @@ MEMBERS
 - edit history (logs)
 
 GROUPS
-- max group size
+- display ppl in a group with average ap/aap/dp
+- count of classes in a group
 - edit history (logs)
 
-make exit not case sensitive
+FOR ALISH: ==========
+logs:
+- logs of progress (exact values changed on last update)
+
+stats:
+- ap/aap/dp + gs per class
+- ap/aap/dp + gs per guild
+- ap/aap/dp + gs per group
+- ap/aap/dp + gs per event
+- count of classes
+- count of classes on each event
+- list and count of ppl below avg gs/ap/aap/dp
+====================
+
+OTHER IDEAS AND THOUGHTS:
 ??? group show members [name]
 more descriptive error messages
+on ?profile create check if there is a disabled profile, if yes, display it and ask if user wants to retrieve it
+
+maybe make the function recursive if recursive = true, then we can reuse validators
+
+
+
+
+?stats base [opt: platoon]
+CLASSES:
+VALK 9
+SHAI 4
+SORC 4
+WIZARD 5
+
+AVG GS  456
+AVG AAP 334
+AVG AP  454
+AVG DP  453
+
+PEOPLE BELOW AVERAGE GS (4)
+[]
+PEOPLE BELOW AVERAGE AAP (2)
+[]
+PEOPLE BELOW AVERAGE AP (3)
+[]
+PEOPLE BELOW AVERAGE DP (2)
+[]
+
+?stats class [opt: platoon]
+CLASS     COUNT     AVG AP    AVG AAP   AVG DP    AVG GS
+asdads      3         234       234       234       466
+
+?event list
+  NEW ICON - STATS
+
+  AVG GS  456
+  AVG AAP 334
+  AVG AP  454
+  AVG DP  453
+
+  YES: 45
+  NO: 23
+  UNDECIDED (3):
+  []
+
 */

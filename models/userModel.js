@@ -21,6 +21,9 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Provide DP."]
   },
+  gearscore: {
+    type: Number
+  },
   characterClass: {
     type: String,
     required: [true, "Provide class."],
@@ -62,13 +65,16 @@ const userSchema = new mongoose.Schema({
     default: true
   },
   createdAt: {
-    type: Date,
-    default: Date.now()
+    type: Date
   },
   deletedAt: Date,
   deletedBy: {
     type: String,
     enum: ["user", "admin", "bot"]
+  },
+  lastUpdate: {
+    type: Date,
+    default: Date.now()
   },
   group: {
     type: mongoose.Schema.ObjectId,
@@ -84,13 +90,13 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 });
 
-userSchema.virtual('gearscore').get(function () {
-  if (this.stance === "succession") {
-    return this.regularAp + this.dp;
-  } else {
-    return Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
-  }
-});
+// userSchema.virtual('gearscore').get(function () {
+//   if (this.stance === "succession") {
+//     return this.regularAp + this.dp;
+//   } else {
+//     return Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
+//   }
+// });
 
 userSchema.pre(/^find/, function (next) {
   this.populate({
@@ -110,13 +116,30 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
-userSchema.pre(/^save/, function (next) {
- if(this.characterClass === "shai") {
-   this.stance = "awakening";
+userSchema.post(/^findOneAndUpdate/, async function (result, next) {
+ if(result.characterClass === "shai") {
+  result.stance = "awakening";
  };
+
+ await result.save();
 
  next();
 });
+
+userSchema.post(/^findOneAndUpdate/, async function (result, next) {
+  if(result.isModified('regularAp') || result.isModified('awakeningAp') || result.isModified('dp')) {
+    result.lastUpdate = Date.now();
+  };
+
+  if (result.stance === "succession") {
+    result.gearscore = result.regularAp + result.dp;
+  } else {
+    result.gearscore = Math.floor((result.regularAp + result.awakeningAp) / 2 + result.dp);
+  };
+  
+  await result.save();
+  next();
+ });
  
 const User = mongoose.model('User', userSchema);
 

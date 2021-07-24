@@ -1,18 +1,21 @@
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const APIFeatures = require('../utils/apiFeatures');
 const Event = require('../models/eventModel');
 const Alert = require('../models/alertModel');
 const User = require('../models/userModel');
 
 
 exports.getAllEvents = catchAsync(async (req, res, next) => {
-  let queryStr = JSON.stringify(req.query);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+  if (!req.filter) req.filter = {};
 
-  let query = Event.find();
-  query.find(JSON.parse(queryStr));
+  const features = new APIFeatures(Event.find(req.filter), req.query)
+  .filter()
+  .sort()
+  .limitFields()
+  .paginate();
 
-  const events = await query;
+  const events = await features.query;
 
   res.status(200).json({
     status: "success",
@@ -36,7 +39,10 @@ exports.getEvent = catchAsync(async (req, res, next) => {
 });
 
 exports.createEvent = catchAsync(async (req, res, next) => {
-  const { date, type, mandatory, alerts, content, messageId, guild } = req.body;
+  const { date, type, mandatory, alerts, maxCount, content, messageId, guild } = req.body;
+
+  const existing = await Event.findOne({ date, guild })
+  if(existing) return next(new AppError("There is already an event with this date.", 409))
 
   // 1. CREATE EVENT
   const newEvent = await Event.create({
@@ -44,11 +50,11 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     type,
     mandatory,
     alerts,
+    maxCount,
     content,
     messageId,
     guild
   });
-
 
   // 2. PUSH USERS TO UNDECIDED ARRAY - MIDDLEWARE NEEDED, MAYBE NESTED ROUTE
   const userDocs = await User.find({ guild })
@@ -128,6 +134,8 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1.5 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
 
   const user = await User.findOne({ id: userDiscordId });
+
+  // TODO: check if still has member role
   if (!user) return next(new AppError("Not a member.", 400))
 
   switch (goToGroup) {

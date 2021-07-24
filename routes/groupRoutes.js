@@ -6,7 +6,7 @@ const router = express.Router({ mergeParams: true });
 router.patch('/:id/assign-one', assignOne)
 router.patch('/:id/assign-many', assignMany)
 router.post('/', createGroup);
-router.get('/:id', getGroup);
+router.get('/:groupId', getGroup);
 router.patch('/:id', updateGroup);
 router.delete('/:id', deleteGroup);
 
