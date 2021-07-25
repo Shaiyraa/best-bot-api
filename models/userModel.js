@@ -116,28 +116,60 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
+userSchema.pre(/^save/, async function (next) {
+  if(this.active === false) {
+    if(this.characterClass === "shai") {
+    this.stance = "awakening";
+    };
+  };
+ 
+  next();
+ });
+ 
+ userSchema.pre(/^save/, async function (next) {
+   if(this.active === false) {
+    if(this.isModified('regularAp') || this.isModified('awakeningAp') || this.isModified('dp')) {
+      this.lastUpdate = Date.now();
+    };
+  
+    if (this.stance === "succession") {
+      this.gearscore = this.regularAp + this.dp;
+    } else {
+      this.gearscore = Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
+    };
+   }
+   
+   next();
+  });
+ 
+  
 userSchema.post(/^findOneAndUpdate/, async function (result, next) {
- if(result.characterClass === "shai") {
-  result.stance = "awakening";
+ if(result.active === false) {
+  if(result.characterClass === "shai") {
+    result.stance = "awakening";
+   };
+  
+   await result.save();
  };
-
- await result.save();
 
  next();
 });
 
 userSchema.post(/^findOneAndUpdate/, async function (result, next) {
-  if(result.isModified('regularAp') || result.isModified('awakeningAp') || result.isModified('dp')) {
-    result.lastUpdate = Date.now();
+  if(result.active === false) {
+    if(result.isModified('regularAp') || result.isModified('awakeningAp') || result.isModified('dp')) {
+      result.lastUpdate = Date.now();
+    };
+
+    if (result.stance === "succession") {
+      result.gearscore = result.regularAp + result.dp;
+    } else {
+      result.gearscore = Math.floor((result.regularAp + result.awakeningAp) / 2 + result.dp);
+    };
+
+    await result.save();
   };
 
-  if (result.stance === "succession") {
-    result.gearscore = result.regularAp + result.dp;
-  } else {
-    result.gearscore = Math.floor((result.regularAp + result.awakeningAp) / 2 + result.dp);
-  };
-  
-  await result.save();
   next();
  });
  

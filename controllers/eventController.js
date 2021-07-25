@@ -169,6 +169,21 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
 
       break;
     };
+    case "undecided": {
+      // 2b. Remove user doc from "no" and "yes" arrays IF it is there
+      const noUser = event.noMembers.find(member => member._id.equals(user._id));
+      if (noUser) event.noMembers.pull(noUser._id);
+
+      const yesUser = event.yesMembers.find(member => member._id.equals(user._id));
+      if (yesUser) event.yesMembers.pull(yesUser._id);
+
+      // 3b. Add user doc to "undecided" array if it doesnt contain it already
+      const undecidedUser = event.undecidedMembers.find(member => member._id.equals(user._id));
+      if (undecidedUser) return next(new AppError("User already exists", 400));
+      event.undecidedMembers.push(user._id);
+
+      break;
+    };
   };
 
   await event.save();

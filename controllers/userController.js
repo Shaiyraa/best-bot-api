@@ -56,7 +56,19 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.createUser = catchAsync(async (req, res, next) => {
-  const { id, familyName, characterClass, stance, regularAp, awakeningAp, dp, level, guild } = req.body;
+  let { id, familyName, characterClass, stance, regularAp, awakeningAp, dp, level, guild } = req.body;
+
+  regularAp = regularAp * 1
+  awakeningAp = awakeningAp * 1
+  dp = dp * 1
+  let gearscore;
+
+  if(stance === "succession") {
+    gearscore = regularAp + dp;
+  } else {
+    gearscore = Math.floor((regularAp + awakeningAp) / 2 + dp);
+  }
+
   const newUser = await User.create({
     id,
     familyName,
@@ -64,10 +76,12 @@ exports.createUser = catchAsync(async (req, res, next) => {
     stance,
     regularAp,
     awakeningAp,
-    dp,
+    dp, 
     level,
+    gearscore,
     guild
-  });
+  }).catch(console.log);
+  console.log("qwe")
 
   res.status(201).json({
     status: "success",
@@ -80,6 +94,8 @@ exports.createUser = catchAsync(async (req, res, next) => {
 exports.updateUser = catchAsync(async (req, res, next) => {
   let { id } = req.params;
   
+ // if(req.query.regularAp || req.query.awakeningAp || req.query.dp) req.query.lastUpdate = Date.now();
+
   const user = await User.findByIdAndUpdate(id, req.query, {
     new: true,
     runValidators: true
@@ -104,7 +120,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
 
   // 2. UPDATE DOC
-  await User.findByIdAndUpdate(user._id, { active: false, deletedAt: Date.now(), deletedBy });
+  await User.findByIdAndUpdate(user._id, { active: false, deletedAt: Date.now(), deletedBy }).catch(console.log);
 
   res.status(204).json({
     status: "success",
