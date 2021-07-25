@@ -54,21 +54,7 @@ const sendErrorProd = (err, req, res) => {
       status: "error",
       message: "Whoops! Something went wrong"
     });
-
-  }
-
-  if (err.isOperational) {
-    return res.status(err.statusCode).render('error', {
-      title: "Something went wrong!",
-      msg: err.message
-    })
-  }
-  console.error("ERROR:", err);
-
-  return res.status(err.statusCode).render('error', {
-    title: "Something went wrong!",
-    msg: "Please, try again later."
-  });
+  };
 };
 
 module.exports = (err, req, res, next) => {
