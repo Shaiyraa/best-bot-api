@@ -10,10 +10,10 @@ exports.getAllEvents = catchAsync(async (req, res, next) => {
   if (!req.filter) req.filter = {};
 
   const features = new APIFeatures(Event.find(req.filter), req.query)
-  .filter()
-  .sort()
-  .limitFields()
-  .paginate();
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
   const events = await features.query;
 
@@ -42,7 +42,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
   const { date, type, mandatory, alerts, maxCount, content, messageId, guild } = req.body;
 
   const existing = await Event.findOne({ date, guild })
-  if(existing) return next(new AppError("There is already an event with this date.", 409))
+  if (existing) return next(new AppError("There is already an event with this date.", 409))
 
   // 1. CREATE EVENT
   const newEvent = await Event.create({
@@ -133,7 +133,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   // check if closed
   if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1.5 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
 
-  const user = await User.findOne({ id: userDiscordId });
+  const user = await User.findOne({ id: userDiscordId, guild: event.guild });
 
   // TODO: check if still has member role
   if (!user) return next(new AppError("Not a member.", 400))
@@ -149,7 +149,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
 
       // 3a. Add user doc to "yes" array if it doesnt contain it already
       const yesUser = event.yesMembers.find(member => member._id.equals(user._id));
-      if (yesUser) return next(new AppError("User already exists", 400));
+      if (yesUser) return next(new AppError("Already reacted with \"yes\".", 400));
       event.yesMembers.push(user._id);
 
       break;
@@ -164,7 +164,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
 
       // 3b. Add user doc to "no" array if it doesnt contain it already
       const noUser = event.noMembers.find(member => member._id.equals(user._id));
-      if (noUser) return next(new AppError("User already exists", 400));
+      if (noUser) return next(new AppError("Already reacted with \"no\".", 400));
       event.noMembers.push(user._id);
 
       break;
@@ -179,7 +179,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
 
       // 3b. Add user doc to "undecided" array if it doesnt contain it already
       const undecidedUser = event.undecidedMembers.find(member => member._id.equals(user._id));
-      if (undecidedUser) return next(new AppError("User already exists", 400));
+      if (undecidedUser) return next(new AppError("Already undecided.", 400));
       event.undecidedMembers.push(user._id);
 
       break;

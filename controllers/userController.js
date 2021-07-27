@@ -63,7 +63,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
   dp = dp * 1
   let gearscore;
 
-  if(stance === "succession") {
+  if (stance === "succession") {
     gearscore = regularAp + dp;
   } else {
     gearscore = Math.floor((regularAp + awakeningAp) / 2 + dp);
@@ -76,7 +76,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
     stance,
     regularAp,
     awakeningAp,
-    dp, 
+    dp,
     level,
     gearscore,
     guild
@@ -91,8 +91,8 @@ exports.createUser = catchAsync(async (req, res, next) => {
 
 exports.updateUser = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  
- // if(req.query.regularAp || req.query.awakeningAp || req.query.dp) req.query.lastUpdate = Date.now();
+
+  // if(req.query.regularAp || req.query.awakeningAp || req.query.dp) req.query.lastUpdate = Date.now();
 
   const user = await User.findByIdAndUpdate(id, req.query, {
     new: true,
@@ -111,14 +111,14 @@ exports.updateUser = catchAsync(async (req, res, next) => {
 
 exports.deleteUser = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { deletedBy } = req.query;
+  const { deletedBy, guild } = req.query;
 
   // 1. FIND USER
-  const user = await User.findById(id)
+  const user = await User.findOne({ _id: id, guild });
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
 
   // 2. UPDATE DOC
-  await User.findByIdAndUpdate(user._id, { active: false, deletedAt: Date.now(), deletedBy }).catch(console.log);
+  await User.findOneAndUpdate({ _id: id, guild }, { active: false, deletedAt: Date.now(), deletedBy }).catch(console.log);
 
   res.status(204).json({
     status: "success",
@@ -131,11 +131,11 @@ exports.deleteUserByDiscordId = catchAsync(async (req, res, next) => {
   const { deletedBy } = req.query;
 
   // 1. FIND USER
-  const user = await User.findOne({ id })
+  const user = await User.findOne({ id, guild });
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
-  
+
   // 2. UPDATE DOC
-  await User.findByIdAndUpdate(user._id, { active: false, deletedAt: Date.now(), deletedBy });
+  await User.findOneAndUpdate({ id, guild }, { active: false, deletedAt: Date.now(), deletedBy });
 
   res.status(204).json({
     status: "success",
