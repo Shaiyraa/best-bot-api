@@ -128,10 +128,10 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 exports.deleteUserByDiscordId = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const { deletedBy } = req.query;
+  const { deletedBy, guild } = req.query;
 
   // 1. FIND USER
-  const user = await User.findOne({ id, guild });
+  const user = await User.findOne({ id, guild }).catch(console.log);
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
 
   // 2. UPDATE DOC
