@@ -132,7 +132,9 @@ userSchema.pre(/^save/, async function (next) {
       this.lastUpdate = Date.now();
     };
 
+    console.log("counting gs -save")
     this.gearscore = Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
+    console.log(this.gearscore)
 
     // if (this.stance === "succession") {
     //   this.gearscore = this.regularAp + this.dp;
@@ -145,8 +147,8 @@ userSchema.pre(/^save/, async function (next) {
 });
 
 
-userSchema.post(/^findOneAndUpdate/, async function (result, next) {
-  if (result.active === false) {
+userSchema.post("findOneAndUpdate", async function (result, next) {
+  if (result.active !== false) {
     if (result.characterClass === "shai") {
       result.stance = "awakening";
     };
@@ -157,13 +159,15 @@ userSchema.post(/^findOneAndUpdate/, async function (result, next) {
   next();
 });
 
-userSchema.post(/^findOneAndUpdate/, async function (result, next) {
-  if (result.active === false) {
+userSchema.post("findOneAndUpdate", async function (result, next) {
+  if (result.active !== false) {
     if (result.isModified('regularAp') || result.isModified('awakeningAp') || result.isModified('dp')) {
       result.lastUpdate = Date.now();
     };
 
+    console.log("counting gs -findoneandupdate")
     result.gearscore = Math.floor((result.regularAp + result.awakeningAp) / 2 + result.dp);
+    console.log(result.gearscore)
 
     // if (result.stance === "succession") {
     //   result.gearscore = result.regularAp + result.dp;
