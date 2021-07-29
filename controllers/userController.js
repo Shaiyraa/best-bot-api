@@ -80,7 +80,8 @@ exports.createUser = catchAsync(async (req, res, next) => {
     level,
     gearscore,
     guild
-  }).catch(console.log);
+  })
+
   res.status(201).json({
     status: "success",
     data: {

@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
   characterClass: {
     type: String,
     required: [true, "Provide class."],
-    enum: ["archer", "berserker", "dark knight", "guardian", "hashashin", "kunoichi", "lahn", "maehwa", "musa", "mystic", "ninja", "nova", "ranger", "sage", "shai", "sorceress", "striker", "tamer", "valkyrie", "warrior", "witch", "wizard"]
+    enum: ["archer", "berserker", "dark knight", "guardian", "hashashin", "kunoichi", "lahn", "maehwa", "musa", "mystic", "ninja", "nova", "ranger", "sage", "shai", "sorceress", "striker", "tamer", "valkyrie", "warrior", "witch", "wizard", "corsair"]
   },
   stance: {
     type: String,
@@ -117,47 +117,47 @@ userSchema.pre(/^find/, function (next) {
 });
 
 userSchema.pre(/^save/, async function (next) {
-  if(this.active === false) {
-    if(this.characterClass === "shai") {
-    this.stance = "awakening";
+  if (this.active === false) {
+    if (this.characterClass === "shai") {
+      this.stance = "awakening";
     };
   };
- 
+
   next();
- });
- 
- userSchema.pre(/^save/, async function (next) {
-   if(this.active === false) {
-    if(this.isModified('regularAp') || this.isModified('awakeningAp') || this.isModified('dp')) {
+});
+
+userSchema.pre(/^save/, async function (next) {
+  if (this.active === false) {
+    if (this.isModified('regularAp') || this.isModified('awakeningAp') || this.isModified('dp')) {
       this.lastUpdate = Date.now();
     };
-  
+
     if (this.stance === "succession") {
       this.gearscore = this.regularAp + this.dp;
     } else {
       this.gearscore = Math.floor((this.regularAp + this.awakeningAp) / 2 + this.dp);
     };
-   }
-   
-   next();
-  });
- 
-  
-userSchema.post(/^findOneAndUpdate/, async function (result, next) {
- if(result.active === false) {
-  if(result.characterClass === "shai") {
-    result.stance = "awakening";
-   };
-  
-   await result.save();
- };
+  }
 
- next();
+  next();
+});
+
+
+userSchema.post(/^findOneAndUpdate/, async function (result, next) {
+  if (result.active === false) {
+    if (result.characterClass === "shai") {
+      result.stance = "awakening";
+    };
+
+    await result.save();
+  };
+
+  next();
 });
 
 userSchema.post(/^findOneAndUpdate/, async function (result, next) {
-  if(result.active === false) {
-    if(result.isModified('regularAp') || result.isModified('awakeningAp') || result.isModified('dp')) {
+  if (result.active === false) {
+    if (result.isModified('regularAp') || result.isModified('awakeningAp') || result.isModified('dp')) {
       result.lastUpdate = Date.now();
     };
 
@@ -171,8 +171,8 @@ userSchema.post(/^findOneAndUpdate/, async function (result, next) {
   };
 
   next();
- });
- 
+});
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
