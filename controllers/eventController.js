@@ -131,7 +131,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   if (event.yesMembers.length >= event.maxCount) return next(new AppError("Signups are full", 403))
 
   // check if closed
-  if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1.5 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
+  if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
 
   const user = await User.findOne({ id: userDiscordId, guild: event.guild });
 
