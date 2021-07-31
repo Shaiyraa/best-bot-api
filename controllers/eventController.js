@@ -95,7 +95,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const { _id, maxCount, active, yesMembers, noMembers, undecidedMembers, date, messageId, guild, ...otherProps } = req.query;
+  const { _id, active, yesMembers, noMembers, undecidedMembers, date, messageId, guild, ...otherProps } = req.query;
 
   const event = await Event.findByIdAndUpdate(id, otherProps, {
     new: true,
@@ -114,7 +114,7 @@ exports.updateEvent = catchAsync(async (req, res, next) => {
 
 exports.deleteEvent = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const event = await Event.findByIdAndUpdate(id, { active: false });
+  await Event.findByIdAndUpdate(id, { active: false });
 
   res.status(204).json({
     status: "success",
