@@ -15,6 +15,7 @@ const globalErrorHandler = require('./controllers/errorController');
 const { restrictToBot } = require('./controllers/authController');
 const guildRouter = require('./routes/guildRoutes');
 const groupRouter = require('./routes/groupRoutes');
+const paGroupRouter = require('./routes/paGroupRoutes');
 const userRouter = require('./routes/userRoutes');
 const eventRouter = require('./routes/eventRoutes');
 const alertRouter = require('./routes/alertRoutes');
@@ -27,7 +28,7 @@ app.use(cors({ origin: '${process.env.API_URL}' })); // TODO: make it work
 
 // limit max requests 
 const limiter = rateLimit({
-  max: 500,
+  max: 1000,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP. Please, try again in an hour."
 });
@@ -50,6 +51,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api/v1/guilds', restrictToBot, guildRouter);
 app.use('/api/v1/groups', restrictToBot, groupRouter);
+app.use('/api/v1/pa-groups', restrictToBot, paGroupRouter);
 app.use('/api/v1/users', restrictToBot, userRouter);
 app.use('/api/v1/events', restrictToBot, eventRouter);
 app.use('/api/v1/alerts', restrictToBot, alertRouter);
@@ -64,7 +66,7 @@ app.use(globalErrorHandler);
 module.exports = app;
 
 
-/*  
+/*
 - ?profile list class sorc
 EVENTS
 - edit history (logs)

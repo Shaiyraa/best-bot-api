@@ -42,11 +42,21 @@ guildSchema.virtual('groups', {
   localField: '_id' // in what field the same value is stored in guild doc
 });
 
+guildSchema.virtual('paGroups', {
+  ref: 'PaGroup',
+  foreignField: 'guild', // where is the value kept on pa group doc
+  localField: '_id' // in what field the same value is stored in guild doc
+});
+
 guildSchema.pre(/^find/, function (next) {
   this.populate({
     path: "groups",
     select: "_id name maxCount"
-  });
+  })
+    .populate({
+      path: "paGroups",
+      select: "_id name maxCount"
+    });
 
   next();
 });

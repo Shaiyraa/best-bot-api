@@ -3,21 +3,6 @@ const catchAsync = require('../utils/catchAsync');
 const Group = require('../models/groupModel');
 const User = require('../models/userModel');
 
-// api/v1/guilds/2324524/groups/2342342
-exports.getGroup = catchAsync(async (req, res, next) => {
-  if (!req.body.guildId) req.body.guildId = req.params.guildId;
-  const groupId = req.params.groupId;
-
-  const group = await Group.findOne({ guild: req.body.guildId, _id: groupId});
-  if(!group) return next(new AppError("Group doesn't exist.", 404));
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      group
-    }
-  });
-})
 
 exports.createGroup = catchAsync(async (req, res, next) => {
   if (!req.body.guildId) req.body.guildId = req.params.guildId;
@@ -39,6 +24,22 @@ exports.createGroup = catchAsync(async (req, res, next) => {
     }
   });
 });
+
+// api/v1/guilds/2324524/groups/2342342
+exports.getGroup = catchAsync(async (req, res, next) => {
+  if (!req.body.guildId) req.body.guildId = req.params.guildId;
+  const groupId = req.params.groupId;
+
+  const group = await Group.findOne({ guild: req.body.guildId, _id: groupId });
+  if (!group) return next(new AppError("No group found.", 404));
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      group
+    }
+  });
+})
 
 exports.getAllGroups = catchAsync(async (req, res, next) => {
   let queryStr = JSON.stringify(req.query);
@@ -67,7 +68,7 @@ exports.updateGroup = catchAsync(async (req, res, next) => {
     runValidators: true
   });
 
-  if (!group) return next(new AppError("No group found", 404));
+  if (!group) return next(new AppError("No group found.", 404));
 
   res.status(201).json({
     status: "success",
@@ -117,12 +118,10 @@ exports.assignMany = catchAsync(async (req, res, next) => {
   if (!group) return next(new AppError("This group doesn't exist", 404));
 
   // update users
-  const users = await User.updateMany({ familyName: { $in: familyNames }, guild: group.guild }, { group: group._id }, { new: true, runValidators: true });
+  await User.updateMany({ familyName: { $in: familyNames }, guild: group.guild }, { group: group._id }, { new: true, runValidators: true });
 
   res.status(201).json({
     status: "success",
-    data: {
-      users
-    }
+    data: null
   });
 });

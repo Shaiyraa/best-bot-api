@@ -115,11 +115,14 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const { deletedBy, guild } = req.query;
 
   // 1. FIND USER
-  const user = await User.findOne({ _id: id, guild });
+  const user = await User.findById(id);
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
 
   // 2. UPDATE DOC
-  await User.findOneAndUpdate({ _id: id, guild }, { active: false, deletedAt: Date.now(), deletedBy }).catch(console.log);
+  user.active = false;
+  user.deletedAt = Date.now();
+  user.deletedBy = deletedBy;
+  await user.save();
 
   res.status(204).json({
     status: "success",
@@ -133,10 +136,14 @@ exports.deleteUserByDiscordId = catchAsync(async (req, res, next) => {
 
   // 1. FIND USER
   const user = await User.findOne({ id, guild }).catch(console.log);
+  console.log(user)
   if (!user) return next(new AppError("This user doesn\'t exist", 404));
 
   // 2. UPDATE DOC
-  await User.findOneAndUpdate({ id, guild }, { active: false, deletedAt: Date.now(), deletedBy });
+  user.active = false;
+  user.deletedAt = Date.now();
+  user.deletedBy = deletedBy;
+  await user.save();
 
   res.status(204).json({
     status: "success",

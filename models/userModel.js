@@ -80,6 +80,10 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Group"
   },
+  paGroup: {
+    type: mongoose.Schema.ObjectId,
+    ref: "PaGroup"
+  },
   guild: {
     type: mongoose.Schema.ObjectId,
     ref: "Guild",
@@ -102,10 +106,15 @@ userSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'guild',
     select: 'id'
-  }).populate({
-    path: 'group',
-    select: 'name'
-  });
+  })
+    .populate({
+      path: 'group',
+      select: 'name'
+    })
+    .populate({
+      path: 'paGroup',
+      select: 'name'
+    });
 
   next();
 })
@@ -117,7 +126,7 @@ userSchema.pre(/^find/, function (next) {
 });
 
 userSchema.pre(/^save/, async function (next) {
-  if (this.active === false) {
+  if (this.active !== false) {
     if (this.characterClass === "shai") {
       this.stance = "awakening";
     };
@@ -127,7 +136,7 @@ userSchema.pre(/^save/, async function (next) {
 });
 
 userSchema.pre(/^save/, async function (next) {
-  if (this.active === false) {
+  if (this.active !== false) {
     if (this.isModified('regularAp') || this.isModified('awakeningAp') || this.isModified('dp')) {
       this.lastUpdate = Date.now();
     };
