@@ -2,6 +2,7 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const APIFeatures = require('../utils/apiFeatures');
 const User = require('../models/userModel');
+const UserChange = require('../models/userChangeModel');
 
 exports.getUserByDiscordId = catchAsync(async (req, res, next) => {
   const { id } = req.params;
@@ -93,19 +94,43 @@ exports.createUser = catchAsync(async (req, res, next) => {
 exports.updateUser = catchAsync(async (req, res, next) => {
   let { id } = req.params;
 
-  // if(req.query.regularAp || req.query.awakeningAp || req.query.dp) req.query.lastUpdate = Date.now();
+  const user = await User.findById(id)
+  if (!user) return next(new AppError("User not found", 404));
 
-  const user = await User.findByIdAndUpdate(id, req.query, {
+  if (req.query.regularAp) {
+    await UserChange.create({
+      changedField: "ap",
+      oldValue: user.regularAp,
+      newValue: req.query.regularAp,
+      user: user._id
+    })
+  }
+  if (req.query.awakeningAp) {
+    await UserChange.create({
+      changedField: "aap",
+      oldValue: user.awakeningAp,
+      newValue: req.query.awakeningAp,
+      user: user._id
+    })
+  }
+  if (req.query.dp) {
+    await UserChange.create({
+      changedField: "dp",
+      oldValue: user.dp,
+      newValue: req.query.dp,
+      user: user._id
+    })
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(id, req.query, {
     new: true,
     runValidators: true
   });
 
-  if (!user) return next(new AppError("No user found", 404));
-
   res.status(201).json({
     status: "success",
     data: {
-      user
+      user: updatedUser
     }
   });
 });

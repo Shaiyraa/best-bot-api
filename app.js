@@ -17,6 +17,7 @@ const guildRouter = require('./routes/guildRoutes');
 const groupRouter = require('./routes/groupRoutes');
 const paGroupRouter = require('./routes/paGroupRoutes');
 const userRouter = require('./routes/userRoutes');
+const userChangeRouter = require('./routes/userChangeRoutes');
 const eventRouter = require('./routes/eventRoutes');
 const alertRouter = require('./routes/alertRoutes');
 
@@ -53,6 +54,7 @@ app.use('/api/v1/guilds', restrictToBot, guildRouter);
 app.use('/api/v1/groups', restrictToBot, groupRouter);
 app.use('/api/v1/pa-groups', restrictToBot, paGroupRouter);
 app.use('/api/v1/users', restrictToBot, userRouter);
+app.use('/api/v1/user-changes', restrictToBot, userChangeRouter);
 app.use('/api/v1/events', restrictToBot, eventRouter);
 app.use('/api/v1/alerts', restrictToBot, alertRouter);
 
