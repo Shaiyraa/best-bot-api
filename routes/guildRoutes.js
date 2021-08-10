@@ -1,5 +1,5 @@
 const express = require('express');
-const { getGuildByDiscordId, getAllGuilds, getGuild, createGuild, updateGuild, deleteGuild } = require('../controllers/guildController');
+const { getGuildByDiscordId, getAllGuilds, getGuild, createGuild, updateGuild, deleteGuild, getAttendance } = require('../controllers/guildController');
 const groupRouter = require('../routes/groupRoutes');
 const paGroupRouter = require('../routes/paGroupRoutes');
 
@@ -14,5 +14,7 @@ router.patch('/:id', updateGuild);
 router.delete('/:id', deleteGuild);
 
 router.get('/discord/:id', getGuildByDiscordId);
+
+//router.get('/:id/attendance', getAttendance);
 
 module.exports = router;

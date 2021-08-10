@@ -89,3 +89,38 @@ exports.deleteGuild = catchAsync(async (req, res, next) => {
     data: null
   });
 });
+
+// exports.getAttendance = catchAsync(async (req, res, next) => {
+//   const { id } = req.params;
+//   const { startDate, endDate } = req.query;
+
+//   const guild = await Guild.findById(id);
+//   if (!guild) return next(new AppError("No guild found", 404));
+
+//   const events = await Event.find({ guild: id, date: { $gte: startDate, $lte: endDate } })
+
+//   // 1. make an object with family names as keys
+//   const users = await User.find({ guild: id })
+
+//   let usersObj = {}
+//   users.forEach(user => {
+//     usersObj[user._id].familyName = user.familyName
+//     usersObj[user._id].attended = 0
+//     usersObj[user._id].totalEventCount = 0
+//     usersObj[user._id].percentage = 0
+//   })
+
+//   // 2. loop through yesArrays of each event
+
+//   /*
+//   return
+//   [{
+//     familyName,
+//     id,
+//     attended: count,
+//     totalEventCount: count
+//     percentage
+//   }]
+//   */
+
+// });

@@ -10,7 +10,6 @@ router.patch('/:id', updateUser);
 router.delete('/:id', deleteUser);
 
 router.delete('/discord/:id', deleteUserByDiscordId);
-
 router.get('/discord/:id', getUserByDiscordId);
 
 module.exports = router;

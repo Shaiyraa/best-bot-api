@@ -74,21 +74,43 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     }
   }]);
 
-  // 3. CREATE REMINDER
-  const alertDate = new Date(date)
-  alertDate.setHours(alertDate.getHours() - 2)
+  // 3. CREATE REMINDERS
+  const alert1Date = new Date(date)
+  alert1Date.setHours(alert1Date.getHours() - 5)
+  const alert2Date = new Date(date)
+  alert2Date.setHours(alert2Date.getHours() - 4)
+  const alert3Date = new Date(date)
+  alert3Date.setHours(alert3Date.getHours() - 3)
+  const alert4Date = new Date(date)
+  alert4Date.setHours(alert4Date.getHours() - 2)
 
-  const alert = await Alert.create({
+  const alert1 = await Alert.create({
     event: newEvent._id,
     type: "undecided",
-    date: alertDate
+    date: alert1Date
+  })
+  const alert2 = await Alert.create({
+    event: newEvent._id,
+    type: "undecided",
+    date: alert2Date
+  })
+  const alert3 = await Alert.create({
+    event: newEvent._id,
+    type: "undecided",
+    date: alert3Date
+  })
+  const alert4 = await Alert.create({
+    event: newEvent._id,
+    type: "undecided",
+    date: alert4Date
   })
 
+  console.log(alert1)
   res.status(201).json({
     status: "success",
     data: {
       event: populated,
-      alert
+      alerts: [alert1, alert2, alert3, alert4]
     }
   });
 });
