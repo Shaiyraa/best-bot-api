@@ -105,7 +105,6 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     date: alert4Date
   })
 
-  console.log(alert1)
   res.status(201).json({
     status: "success",
     data: {
