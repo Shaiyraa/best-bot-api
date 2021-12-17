@@ -39,8 +39,9 @@ exports.getEvent = catchAsync(async (req, res, next) => {
 });
 
 exports.createEvent = catchAsync(async (req, res, next) => {
-  const { date, type, mandatory, alerts, maxCount, content, messageId, guild } = req.body;
+  const { date, type, mandatory, alerts, maxCount, content, messageId, messageChannelId, guild } = req.body;
 
+  console.log("CHANNEL ID", messageChannelId)
   const existing = await Event.findOne({ date, guild })
   if (existing) return next(new AppError("There is already an event with this date.", 409))
 
@@ -52,6 +53,7 @@ exports.createEvent = catchAsync(async (req, res, next) => {
     alerts,
     maxCount,
     content,
+    messageChannelId,
     messageId,
     guild
   });
@@ -116,9 +118,28 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const { _id, active, yesMembers, noMembers, undecidedMembers, date, messageId, guild, ...otherProps } = req.query;
+  const { _id, active, yesMembers, noMembers, undecidedMembers, date, messageId, messageChannelId, guild, ...otherProps } = req.query;
 
   const event = await Event.findByIdAndUpdate(id, otherProps, {
+    new: true,
+    runValidators: true
+  });
+
+  if (!event) return next(new AppError("No event found", 404));
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      event
+    }
+  });
+});
+
+exports.updateEventMessageId = catchAsync(async (req, res, next) => {
+  let { id } = req.params;
+  const { messageId } = req.query;
+
+  const event = await Event.findByIdAndUpdate(id, { messageId }, {
     new: true,
     runValidators: true
   });
@@ -149,7 +170,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   const event = await Event.findById(eventId);
 
   // check if capped
-  if (event.yesMembers.length >= event.maxCount) return next(new AppError("Signups are full", 403))
+  if (event.yesMembers.length >= event.maxCount && goToGroup === "yes") return next(new AppError("Signups are full", 403))
 
   // check if closed
   if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))

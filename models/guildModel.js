@@ -15,10 +15,10 @@ const guildSchema = new mongoose.Schema({
     type: String,
     required: [true, "Provide officerRole name."]
   },
-  announcementsChannel: {
-    type: String,
-    required: [true, "Provide announcementsChannel name."]
-  },
+  // announcementsChannel: {
+  //   type: String,
+  //   required: [true, "Provide announcementsChannel name."]
+  // },
   remindersChannel: {
     type: String,
     required: [true, "Provide remindersChannel name."]

@@ -45,13 +45,13 @@ exports.getGuild = catchAsync(async (req, res, next) => {
 });
 
 exports.createGuild = catchAsync(async (req, res, next) => {
-  const { id, memberRole, officerRole, announcementsChannel, remindersChannel } = req.body;
+  const { id, memberRole, officerRole, remindersChannel } = req.body;
 
   const newGuild = await Guild.create({
     id,
     memberRole,
     officerRole,
-    announcementsChannel,
+    // announcementsChannel,
     remindersChannel
   });
 

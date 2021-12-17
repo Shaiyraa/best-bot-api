@@ -14,6 +14,10 @@ const eventSchema = new mongoose.Schema({
     type: Number,
     default: 100
   },
+  messageChannelId: {
+    type: String,
+    required: [true, "Provide message channel ID."]
+  },
   messageId: {
     type: String,
     required: [true, "Provide message ID."]
@@ -97,7 +101,7 @@ eventSchema.pre(/^find/, function (next) {
     })
     .populate({
       path: 'guild',
-      select: 'id announcementsChannel remindersChannel memberRole officerRole groups'
+      select: 'id remindersChannel memberRole officerRole groups'
     })
 
   next()
