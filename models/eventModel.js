@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const eventSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ["nodewar", "siege", "event"],
+    enum: ["nodewar", "siege", "guildevent"],
     default: "nodewar"
   },
   date: {
