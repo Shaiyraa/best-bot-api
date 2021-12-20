@@ -170,7 +170,7 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   const event = await Event.findById(eventId);
 
   // check if capped
-  if (event.yesMembers.length >= event.maxCount && goToGroup === "yes") return next(new AppError("Signups are full", 403))
+  //if (event.yesMembers.length >= event.maxCount && goToGroup === "yes") return next(new AppError("Signups are full", 403))
 
   // check if closed
   if ((event.date.getTime() - new Date(Date.now()).getTime()) <= 1 * 60 * 60 * 1000) return next(new AppError("Signups are closed", 403))
@@ -189,14 +189,37 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
       const noUser = event.noMembers.find(member => member._id.equals(user._id));
       if (noUser) event.noMembers.pull(noUser._id);
 
-      // 3a. Add user doc to "yes" array if it doesnt contain it already
       const yesUser = event.yesMembers.find(member => member._id.equals(user._id));
-      if (yesUser) return next(new AppError("Already reacted with \"yes\".", 400));
-      event.yesMembers.push(user._id);
+      const waitlistedUser = event.waitlistedMembers.find(member => member._id.equals(user._id));
+      if (yesUser || waitlistedUser) return next(new AppError("Already reacted with \"yes\".", 400));
 
+      // CHECK IF WAITLIST
+      if (event.yesMembers.length >= event.maxCount) {
+        // TODO: waitlist
+        console.log(event.waitlistedMembers)
+        event.waitlistedMembers.push(user._id);
+        console.log(event.waitlistedMembers)
+
+      } else {
+        // 3a. Add user doc to "yes" array if it doesnt contain it already
+        event.yesMembers.push(user._id);
+      };
       break;
     };
     case "no": {
+      // TODO: IF SOMEONE IS WAITLISTED, SWITCH HIM TO YES
+      if (event.waitlistedMembers[0]) {
+        const memberToMove = event.waitlistedMembers[0];
+        //console.log(event.waitlistedMembers)
+        event.waitlistedMembers.splice(0, 1);
+        //console.log(event.waitlistedMembers)
+
+        // if waitlisted[0] member is the same as the current one
+        if (!user._id.equals(memberToMove._id)) {
+          event.yesMembers.push(memberToMove._id);
+        };
+      };
+
       // 2b. Remove user doc from "undecided" and "yes" arrays IF it is there
       const undecidedUser = event.undecidedMembers.find(member => member._id.equals(user._id));
       if (undecidedUser) event.undecidedMembers.pull(undecidedUser._id);
@@ -252,6 +275,14 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
   },
   {
     path: 'yesMembers',
+    populate: {
+      path: "",
+      select: "group",
+      model: 'User'
+    }
+  },
+  {
+    path: 'waitlistedMembers',
     populate: {
       path: "",
       select: "group",

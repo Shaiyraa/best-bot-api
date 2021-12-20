@@ -54,6 +54,10 @@ const eventSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "User"
   }],
+  waitlistedMembers: [{
+    type: mongoose.Schema.ObjectId,
+    ref: "User"
+  }],
   guild: {
     type: mongoose.Schema.ObjectId,
     ref: "Guild"
@@ -94,6 +98,13 @@ eventSchema.pre(/^find/, function (next) {
     })
     .populate({
       path: 'noMembers',
+      populate: {
+        path: "",
+        model: 'User'
+      }
+    })
+    .populate({
+      path: 'waitlistedMembers',
       populate: {
         path: "",
         model: 'User'
