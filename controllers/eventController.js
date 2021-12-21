@@ -118,19 +118,72 @@ exports.createEvent = catchAsync(async (req, res, next) => {
 
 exports.updateEvent = catchAsync(async (req, res, next) => {
   let { id } = req.params;
-  const { _id, active, yesMembers, noMembers, undecidedMembers, date, messageId, messageChannelId, guild, ...otherProps } = req.query;
+  const { _id, active, yesMembers, noMembers, undecidedMembers, waitlistedMembers, date, messageId, messageChannelId, guild, ...otherProps } = req.query;
 
   const event = await Event.findByIdAndUpdate(id, otherProps, {
     new: true,
     runValidators: true
   });
 
+  if (otherProps.maxCount) {
+    console.log("otherProps maxCount")
+    if (event.waitlistedMembers.length >= 1) {
+      console.log("waitlist has items")
+      let freeSpace = event.maxCount - event.yesMembers.length;
+      for (let i = 0; i < freeSpace; i++) {
+        let memberToMove = event.waitlistedMembers[0];
+        console.log(memberToMove)
+        event.waitlistedMembers.splice(0, 1);
+        console.log("spliced")
+
+        event.yesMembers.push(memberToMove._id);
+        console.log(event.yesMembers)
+      };
+    };
+  };
+
   if (!event) return next(new AppError("No event found", 404));
+
+  const populated = await Event.populate(event, [{
+    path: 'guild',
+    select: 'groups'
+  }, {
+    path: 'undecidedMembers',
+    populate: {
+      path: "",
+      select: "group",
+      model: 'User'
+    }
+  },
+  {
+    path: 'noMembers',
+    populate: {
+      path: "",
+      select: "group",
+      model: 'User'
+    }
+  },
+  {
+    path: 'yesMembers',
+    populate: {
+      path: "",
+      select: "group",
+      model: 'User'
+    }
+  },
+  {
+    path: 'waitlistedMembers',
+    populate: {
+      path: "",
+      select: "group",
+      model: 'User'
+    }
+  }]);
 
   res.status(201).json({
     status: "success",
     data: {
-      event
+      event: populated
     }
   });
 });
