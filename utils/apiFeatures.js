@@ -4,7 +4,7 @@ module.exports = class APIFeatures {
     this.query = query;
     this.page = page;
     this.sortKeys = sort;
-    this.limit = limit;
+    this.limit = limit || 1000;
     this.fields = fields;
     this.queryObj = queryObj;
   };
