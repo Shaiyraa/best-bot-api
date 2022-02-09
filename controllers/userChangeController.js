@@ -4,15 +4,8 @@ const APIFeatures = require('../utils/apiFeatures');
 const UserChange = require('../models/userChangeModel');
 
 exports.getAllUserChanges = catchAsync(async (req, res, next) => {
-  if (!req.filter) req.filter = {};
-
-  const features = new APIFeatures(UserChange.find(req.filter), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-
-  const userChanges = await features.query;
+  const userId = req.query.user;
+  const userChanges = await UserChange.find({ user: userId }).sort({ _id: -1 }).limit(10)
 
   res.status(200).json({
     status: "success",
