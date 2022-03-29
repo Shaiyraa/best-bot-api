@@ -260,23 +260,20 @@ exports.changeUserGroup = catchAsync(async (req, res, next) => {
       break;
     };
     case "no": { //// =================
-      // TODO: IF SOMEONE IS WAITLISTED, SWITCH HIM TO YES
-      if (event.waitlistedMembers[0]) {
-        const memberToMove = event.waitlistedMembers[0];
-        event.waitlistedMembers.splice(0, 1);
-
-        // if waitlisted[0] member is the same as the current one
-        if (!user._id.equals(memberToMove._id)) {
-          event.yesMembers.push(memberToMove._id);
-        };
-      };
 
       // 2b. Remove user doc from "undecided" and "yes" arrays IF it is there
       const undecidedUser = event.undecidedMembers.find(member => member._id.equals(user._id));
       if (undecidedUser) event.undecidedMembers.pull(undecidedUser._id);
 
       const yesUser = event.yesMembers.find(member => member._id.equals(user._id));
-      if (yesUser) event.yesMembers.pull(yesUser._id);
+      if (yesUser) {
+        event.yesMembers.pull(yesUser._id);
+        if (event.waitlistedMembers[0]) {
+          const memberToMove = event.waitlistedMembers[0];
+          event.waitlistedMembers.splice(0, 1);
+          event.yesMembers.push(memberToMove._id);
+        };
+      }
 
       // remove user doc from "waitlisted" array IF it is There
       const waitlistedUser = event.waitlistedMembers.find(member => member._id.equals(user._id));
